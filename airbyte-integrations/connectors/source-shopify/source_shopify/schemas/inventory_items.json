@@ -1,0 +1,40 @@
+{
+  "properties": {
+    "id": {
+      "type": ["null", "integer"]
+    },
+    "sku": {
+      "type": ["null", "string"]
+    },
+    "created_at": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "requires_shipping": {
+      "type": ["null", "boolean"]
+    },
+    "cost": {
+      "type": ["null", "number"]
+    },
+    "country_code_of_origin": {
+      "type": ["null", "string"]
+    },
+    "province_code_of_origin": {
+      "type": ["null", "string"]
+    },
+    "harmonized_system_code": {
+      "type": ["null", "integer"]
+    },
+    "tracked": {
+      "type": ["null", "boolean"]
+    },
+    "admin_graphql_api_id": {
+      "type": ["null", "string"]
+    }
+  },
+  "type": "object"
+}

@@ -269,6 +269,29 @@ class DiscountCodes(IncrementalShopifyStream):
             yield from super().read_records(stream_slice={"price_rule_id": data["id"]}, **kwargs)
 
 
+class InventoryItems(IncrementalShopifyStream):
+    data_field = "inventory_items"
+
+    def path(self, stream_slice: Mapping[str, Any] = None, **kwargs) -> str:
+        return f"{self.data_field}.json"
+
+    def request_params(
+        self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None, **kwargs
+    ) -> MutableMapping[str, Any]:
+        return {
+            'ids': stream_slice['inventory_item_ids'],
+            'limit': self.limit,
+        }
+
+    def read_records(self, stream_slice: Optional[Mapping[str, Any]] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
+        products_stream = Products(
+            authenticator=self.authenticator, shop=self.shop, start_date=self.start_date, api_password=self.api_password
+        )
+        for data in products_stream.read_records(sync_mode=SyncMode.full_refresh):
+            inventory_item_ids = ','.join([str(variant['inventory_item_id']) for variant in data['variants']])
+            yield from super().read_records(stream_slice={"inventory_item_ids": inventory_item_ids}, **kwargs)
+
+
 class ShopifyAuthenticator(HttpAuthenticator):
 
     """
@@ -327,4 +350,5 @@ class SourceShopify(AbstractSource):
             Pages(**args),
             PriceRules(**args),
             DiscountCodes(**args),
+            InventoryItems(**args),
         ]
