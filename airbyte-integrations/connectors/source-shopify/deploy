@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -xeuo pipefail
+
+registry="public.ecr.aws/h2q0d0y8"
+repo="source-shopify"
+
+tag="$(grep io.airbyte.version Dockerfile | cut -d = -f 2)"
+image="${registry}/${repo}:${tag}"
+
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$registry"
+
+docker build --tag "$image" .
+docker push "$image"
