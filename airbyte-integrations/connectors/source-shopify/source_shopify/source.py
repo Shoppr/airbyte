@@ -25,6 +25,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, List, Mapping, MutableMapping, Optional, Tuple
 from urllib.parse import parse_qsl, urlparse
+import itertools
 
 import requests
 from airbyte_cdk import AirbyteLogger
@@ -278,17 +279,24 @@ class InventoryItems(IncrementalShopifyStream):
     def request_params(
         self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None, **kwargs
     ) -> MutableMapping[str, Any]:
-        return {
-            'ids': stream_slice['inventory_item_ids'],
-            'limit': self.limit,
-        }
+        inventory_item_ids = stream_slice["inventory_item_ids"]
+        return {"ids": inventory_item_ids, "limit": self.limit}
 
     def read_records(self, stream_slice: Optional[Mapping[str, Any]] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
         products_stream = Products(
             authenticator=self.authenticator, shop=self.shop, start_date=self.start_date, api_password=self.api_password
         )
-        for data in products_stream.read_records(sync_mode=SyncMode.full_refresh):
-            inventory_item_ids = ','.join([str(variant['inventory_item_id']) for variant in data['variants']])
+        # Batch all product variants into maximum of {limit} items each
+        # The batches will be requested one after another
+        products = list(products_stream.read_records(sync_mode=SyncMode.full_refresh))
+        product_variants = list(itertools.chain.from_iterable(map(lambda product: product["variants"], products)))
+        total = len(product_variants)
+        for i in range(0, total, self.limit):
+            j = min(i + self.limit, total)
+            variants = product_variants[i:j]
+            # The ids needs to be a comma-separated string
+            # /admin/api/2021-04/inventory_items.json?ids=808950810,39072856,457924702 
+            inventory_item_ids = ",".join([str(variant["inventory_item_id"]) for variant in variants])
             yield from super().read_records(stream_slice={"inventory_item_ids": inventory_item_ids}, **kwargs)
 
 
