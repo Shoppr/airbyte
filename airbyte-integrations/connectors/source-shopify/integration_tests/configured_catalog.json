@@ -4345,57 +4345,6 @@
       "sync_mode": "incremental",
       "cursor_field": ["updated_at"],
       "destination_sync_mode": "append"
-    },
-    {
-      "stream": {
-        "name": "inventory_items",
-        "json_schema": {
-          "properties": {
-            "id": {
-              "type": ["null", "integer"]
-            },
-            "sku": {
-              "type": ["null", "string"]
-            },
-            "created_at": {
-              "type": ["null", "string"],
-              "format": "date-time"
-            },
-            "updated_at": {
-              "type": ["null", "string"],
-              "format": "date-time"
-            },
-            "requires_shipping": {
-              "type": ["null", "boolean"]
-            },
-            "cost": {
-              "type": ["null", "number"]
-            },
-            "country_code_of_origin": {
-              "type": ["null", "string"]
-            },
-            "province_code_of_origin": {
-              "type": ["null", "string"]
-            },
-            "harmonized_system_code": {
-              "type": ["null", "integer"]
-            },
-            "tracked": {
-              "type": ["null", "boolean"]
-            },
-            "admin_graphql_api_id": {
-              "type": ["null", "string"]
-            }
-          },
-          "type": "object"
-        },
-        "supported_sync_modes": ["full_refresh", "incremental"],
-        "source_defined_cursor": true,
-        "default_cursor_field": ["updated_at"]
-      },
-      "sync_mode": "incremental",
-      "cursor_field": ["updated_at"],
-      "destination_sync_mode": "append"
     }
   ]
 }
