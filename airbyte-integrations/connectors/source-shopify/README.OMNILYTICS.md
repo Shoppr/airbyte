@@ -100,12 +100,8 @@ python3 main.py read --config secrets/config.json --catalog secrets/catalog.json
 
 ## Deploying
 
-To build and deploy the image, just run the deploy script:
+Bump the `io.airbyte.version` in `Dockerfile`, then deploy:
 
 ```
 ./deploy
 ```
-
-The deploy script tags the built image with the `io.airbyte.version`
-version from `Dockerfile`. So, make sure the version is bumped before
-deploying.
