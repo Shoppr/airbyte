@@ -18,7 +18,7 @@
       "type": ["null", "boolean"]
     },
     "cost": {
-      "type": ["null", "number"]
+      "type": ["null", "string"]
     },
     "country_code_of_origin": {
       "type": ["null", "string"]
@@ -31,6 +31,20 @@
     },
     "tracked": {
       "type": ["null", "boolean"]
+    },
+    "country_harmonized_system_codes": {
+      "type": ["null", "array"],
+      "items": {
+        "type": ["null", "object"],
+        "properties": {
+          "harmonized_system_code": {
+            "type": ["null", "string"]
+          },
+          "country_code": {
+            "type": ["null", "string"]
+          }
+        }
+      }
     },
     "admin_graphql_api_id": {
       "type": ["null", "string"]
