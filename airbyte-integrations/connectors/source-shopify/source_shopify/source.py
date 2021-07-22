@@ -318,10 +318,14 @@ class InventoryItems(IncrementalShopifyStream):
     def request_params(
         self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None, **kwargs
     ) -> MutableMapping[str, Any]:
-        inventory_item_ids = stream_slice["inventory_item_ids"]
-        return {"ids": inventory_item_ids, "limit": self.limit}
+        params = super().request_params(stream_state=stream_state, next_page_token=next_page_token, **kwargs)
+        params["ids"] = stream_slice["inventory_item_ids"]
+        return params
 
-    def read_records(self, stream_slice: Optional[Mapping[str, Any]] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
+    def read_records(
+        self, stream_state: Mapping[str, Any] = None, stream_slice: Optional[Mapping[str, Any]] = None, **kwargs
+    ) -> Iterable[Mapping[str, Any]]:
+        stream_state = stream_state or {}
         products_stream = Products(
             authenticator=self.authenticator, shop=self.shop, start_date=self.start_date, api_password=self.api_password
         )
@@ -334,9 +338,10 @@ class InventoryItems(IncrementalShopifyStream):
             j = min(i + self.limit, total)
             variants = product_variants[i:j]
             # The ids needs to be a comma-separated string
-            # /admin/api/2021-04/inventory_items.json?ids=808950810,39072856,457924702 
+            # e.g. /admin/api/2021-04/inventory_items.json?ids=808950810,39072856,457924702 
             inventory_item_ids = ",".join([str(variant["inventory_item_id"]) for variant in variants])
-            yield from super().read_records(stream_slice={"inventory_item_ids": inventory_item_ids}, **kwargs)
+            inventory_item_slice = super().read_records(stream_slice={"inventory_item_ids": inventory_item_ids}, **kwargs)
+            yield from self.filter_records_newer_than_state(stream_state=stream_state, records_slice=inventory_item_slice)
 
 
 class ShopifyAuthenticator(HttpAuthenticator):
