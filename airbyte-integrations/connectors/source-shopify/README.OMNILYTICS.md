@@ -31,10 +31,10 @@ git push
 
 ## Testing
 
-Follow the instructions for locally running the connector in the
-[README](./README.md). You should have the `secrets`
+Follow the instructions to setup the environment for locally running the
+connector in the [README](./README.md).
 
-Setup `secrets/config.json`:
+You should have `secrets/config.json`:
 
 ```
 {
